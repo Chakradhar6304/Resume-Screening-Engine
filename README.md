@@ -78,10 +78,11 @@ You can build and run this project as a Docker container.
 Build the Docker image:
 
 docker build -t resume-screening-engine .
-
+https://imgur.com/a/Mgwngpr
 Run the Docker container:
 To run the screening on a sample resume inside the container:
 
 docker run resume-screening-engine --file resumes/sample_resume_ds.txt
+
 
 This encapsulates the entire application and its dependencies, making it highly portable.
