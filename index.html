@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Matcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        /* Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">AI Resume Matcher</h1>
+            <p class="text-lg text-gray-600 mt-2">Score candidates by matching resumes against a job description.</p>
+        </header>
+
+        <!-- Job Description Input -->
+        <div id="job-description-section" class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in">
+            <div class="flex items-center mb-4">
+                 <span class="flex items-center justify-center text-white bg-indigo-500 rounded-full h-8 w-8 text-sm font-bold">1</span>
+                 <h2 class="ml-3 text-2xl font-semibold text-gray-800">Paste Job Description</h2>
+            </div>
+            <textarea id="jobDescription" rows="8" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 transition" placeholder="Paste the full job description here..."></textarea>
+        </div>
+
+        <!-- Resumes Input Section -->
+        <div id="resumes-section" class="bg-white rounded-xl shadow-lg p-6 mb-8 fade-in" style="animation-delay: 0.2s;">
+             <div class="flex items-center mb-4">
+                 <span class="flex items-center justify-center text-white bg-indigo-500 rounded-full h-8 w-8 text-sm font-bold">2</span>
+                 <h2 class="ml-3 text-2xl font-semibold text-gray-800">Add Candidate Resumes</h2>
+            </div>
+            <div id="resumeInputsContainer" class="space-y-4">
+                <!-- Resume inputs will be added here -->
+            </div>
+            <div class="flex justify-between items-center mt-4">
+                <button id="addResumeBtn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 transition">+ Add Another Resume</button>
+                <button id="analyzeBtn" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition text-lg">
+                    Calculate Match Scores
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="fade-in" style="animation-delay: 0.4s;">
+            <div class="flex items-center mb-4">
+                 <span class="flex items-center justify-center text-white bg-indigo-500 rounded-full h-8 w-8 text-sm font-bold">3</span>
+                 <h2 class="ml-3 text-2xl font-semibold text-gray-800">Candidate Rankings</h2>
+            </div>
+            <div id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Enhanced Resume Matching Logic ---
+
+        const jobDescriptionEl = document.getElementById('jobDescription');
+        const resumeInputsContainer = document.getElementById('resumeInputsContainer');
+        const addResumeBtn = document.getElementById('addResumeBtn');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultsEl = document.getElementById('results');
+
+        let resumeCount = 0;
+
+        // Pre-defined skill keywords
+        const SKILL_KEYWORDS = [
+            'python', 'java', 'c++', 'c#', 'javascript', 'typescript', 'react', 'angular', 'vue', 'node.js', 'next.js',
+            'django', 'flask', 'spring boot', 'ruby on rails', 'html', 'css', 'sass', 'tailwind css', 'sql', 'nosql',
+            'mongodb', 'postgresql', 'mysql', 'redis', 'graphql', 'rest api', 'git', 'docker', 'kubernetes', 'aws',
+            'azure', 'gcp', 'terraform', 'jenkins', 'ci/cd', 'tensorflow', 'pytorch', 'scikit-learn', 'pandas', 'numpy',
+            'machine learning', 'deep learning', 'natural language processing', 'nlp', 'computer vision',
+            'data analysis', 'data visualization', 'tableau', 'power bi', 'project management', 'agile', 'scrum', 'jira',
+            'product management', 'leadership', 'communication', 'problem solving', 'system design', 'microservices'
+        ];
+
+        function createNewResumeInput() {
+            resumeCount++;
+            const div = document.createElement('div');
+            div.id = `resume-block-${resumeCount}`;
+            div.className = 'p-4 border rounded-lg bg-gray-50';
+            div.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <label class="font-semibold text-gray-700">Candidate #${resumeCount}</label>
+                    <button onclick="removeResume(${resumeCount})" class="text-red-500 hover:text-red-700 font-bold">X</button>
+                </div>
+                <textarea id="resumeText-${resumeCount}" rows="10" class="w-full p-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-400 transition" placeholder="Paste resume #${resumeCount} here..."></textarea>
+            `;
+            resumeInputsContainer.appendChild(div);
+        }
+        
+        function removeResume(id) {
+            document.getElementById(`resume-block-${id}`).remove();
+        }
+
+        addResumeBtn.addEventListener('click', createNewResumeInput);
+
+        analyzeBtn.addEventListener('click', () => {
+            const jobText = jobDescriptionEl.value;
+            if (!jobText.trim()) {
+                alert('Please paste a job description first.');
+                return;
+            }
+
+            resultsEl.innerHTML = '<div class="col-span-full flex justify-center items-center p-10"><div class="loader"></div><p class="ml-4 text-gray-600">Analyzing candidates...</p></div>';
+            
+            setTimeout(() => {
+                const jobSkills = extractSkills(jobText);
+                const candidates = [];
+
+                for (let i = 1; i <= resumeCount; i++) {
+                    const resumeBlock = document.getElementById(`resume-block-${i}`);
+                    if (resumeBlock) {
+                        const resumeTextEl = document.getElementById(`resumeText-${i}`);
+                        const resumeText = resumeTextEl.value;
+                        if (resumeText.trim()) {
+                            const profile = parseResumeText(resumeText, jobSkills, i);
+                            candidates.push(profile);
+                        }
+                    }
+                }
+
+                // Sort candidates by score (highest first)
+                candidates.sort((a, b) => b.score - a.score);
+                displayResults(candidates);
+            }, 1000); // Simulate analysis time
+        });
+
+        function extractSkills(text) {
+            const foundSkills = new Set();
+            const textLower = text.toLowerCase();
+            SKILL_KEYWORDS.forEach(skill => {
+                const regex = new RegExp(`\\b${skill.replace('+', '\\+').replace('.', '\\.')}\\b`, 'gi');
+                if (textLower.match(regex)) {
+                    foundSkills.add(skill);
+                }
+            });
+            return foundSkills;
+        }
+
+        function parseResumeText(text, jobSkills, id) {
+            const resumeSkills = extractSkills(text);
+            
+            const matchingSkills = new Set([...resumeSkills].filter(skill => jobSkills.has(skill)));
+            const missingSkills = new Set([...jobSkills].filter(skill => !resumeSkills.has(skill)));
+
+            const score = jobSkills.size > 0 ? Math.round((matchingSkills.size / jobSkills.size) * 100) : 0;
+
+            return {
+                id,
+                score,
+                name: text.match(/(^[A-Z][a-z]+([ .'-][A-Z][a-z]+){1,2})/)?.[0] || `Candidate #${id}`,
+                email: text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/)?.[0] || 'Not found',
+                phone: text.match(/\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/)?.[0] || 'Not found',
+                matchingSkills: [...matchingSkills],
+                missingSkills: [...missingSkills]
+            };
+        }
+
+        function displayResults(candidates) {
+            resultsEl.innerHTML = '';
+            if (candidates.length === 0) {
+                resultsEl.innerHTML = '<p class="col-span-full text-center text-gray-500 p-10">No resumes were analyzed. Please add resumes and try again.</p>';
+                return;
+            }
+
+            candidates.forEach((profile, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md p-5 border-t-4 fade-in';
+                card.style.animationDelay = `${index * 100}ms`;
+
+                let scoreColorClass = 'border-green-500';
+                if (profile.score < 70) scoreColorClass = 'border-yellow-500';
+                if (profile.score < 40) scoreColorClass = 'border-red-500';
+                card.classList.add(scoreColorClass);
+
+                const matchingSkillsHtml = profile.matchingSkills.length > 0 ? profile.matchingSkills.map(s => `<span class="skill-tag bg-green-100 text-green-800">${s}</span>`).join('') : '<p class="text-sm text-gray-500">None</p>';
+                const missingSkillsHtml = profile.missingSkills.length > 0 ? profile.missingSkills.map(s => `<span class="skill-tag bg-red-100 text-red-800">${s}</span>`).join('') : '<p class="text-sm text-gray-500">None</p>';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">${profile.name}</h3>
+                            <p class="text-sm text-gray-500">${profile.email}</p>
+                        </div>
+                        <div class="text-2xl font-bold ${scoreColorClass.replace('border', 'text')}">${profile.score}%</div>
+                    </div>
+                    <hr class="my-3">
+                    <div>
+                        <h4 class="font-semibold mb-2 text-gray-700">Matching Skills (${profile.matchingSkills.length})</h4>
+                        <div class="flex flex-wrap gap-2">${matchingSkillsHtml}</div>
+                    </div>
+                    <div class="mt-4">
+                        <h4 class="font-semibold mb-2 text-gray-700">Missing Skills (${profile.missingSkills.length})</h4>
+                        <div class="flex flex-wrap gap-2">${missingSkillsHtml}</div>
+                    </div>
+                `;
+                resultsEl.appendChild(card);
+            });
+            
+            // Add a style tag for the skill tags dynamically
+            const style = document.createElement('style');
+            style.innerHTML = `.skill-tag { display: inline-block; font-size: 0.75rem; font-medium; padding: 2px 8px; border-radius: 9999px; }`;
+            document.head.appendChild(style);
+        }
+
+        // Initialize with one resume input
+        createNewResumeInput();
+    </script>
+</body>
+</html>

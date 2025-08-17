@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-selfcheck.json
+
+# TensorFlow / Keras Models
+*.h5
+*.keras
+
+# IDE / Editor specific
+.vscode/
+.idea/
+
+# Data files (if they are large or sensitive)
+# data/large_dataset.csv
+
+# OS specific
+.DS_Store
+Thumbs.db
