@@ -1,95 +1,32 @@
-Getting Started
-Prerequisites
-Python 3.8+
+# AI Resume Matcher 🤖
 
-pip
+An intelligent web-based tool to automatically score and rank job candidates by matching their resumes against a given job description. This project uses natural language processing (NLP) techniques directly in the browser to extract key skills and provide an instant analysis of candidate suitability.
 
-Docker (optional, for containerized deployment)
-
-Installation
-Clone the repository:
-
-git clone <repository-url>
-cd resume-screening-engine
-
-Create and activate a virtual environment:
-
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-
-Install the required packages:
-
-pip install -r requirements.txt
-
-Download the spaCy model:
-
-python -m spacy download en_core_web_sm
-
-Training the Model
-Before you can run the main application, you need to train the classification model.
-
-python model_builder.py
-
-This script will read the data/resumes.csv file, train a TensorFlow model, and save it to the models/ directory.
-
-Running the Application
-To process a single resume and see the output:
-
-python main.py --file resumes/sample_resume_se.txt
-
-You can replace resumes/sample_resume_se.txt with the path to any resume you want to screen.
-
-How It Works
-resume_parser.py: This script handles the parsing of resume files.
-
-It reads the text from the file.
-
-It uses spaCy to perform NER to extract entities like names, emails, phone numbers, and skills from the text.
-
-It returns a structured dictionary (JSON) of the extracted information.
-
-model_builder.py: This script is responsible for building and training the ML model.
-
-It loads the sample resume data from data/resumes.csv.
-
-It preprocesses the text data using Tokenizer and padding.
-
-It builds a simple sequential neural network using TensorFlow/Keras.
-
-It trains the model on the data and saves the trained model to the models/ directory.
-
-main.py: This is the main entry point of the application.
-
-It takes a file path as a command-line argument.
-
-It loads the pre-trained TensorFlow model.
-
-It uses resume_parser.py to parse the resume and extract its text.
-
-It uses the loaded model to predict the category of the resume.
-
-It then uses the parser again to extract a structured profile.
-
-Finally, it prints the classification and the structured profile as a JSON object.
-
-Containerization with Docker
-You can build and run this project as a Docker container.
-
-Build the Docker image:
-
-docker build -t resume-screening-engine .
-
-Run the Docker container:
-To run the screening on a sample resume inside the container:
-
-docker run resume-screening-engine --file resumes/sample_resume_ds.txt
-
-
-This encapsulates the entire application and its dependencies, making it highly portable.
-
+![AI Resume Matcher Screenshot]
 <img width="1920" height="863" alt="Screenshot (532)" src="https://github.com/user-attachments/assets/0e1152dc-22d5-46fb-932d-f04731237200" />
 <img width="1920" height="848" alt="Screenshot (533)" src="https://github.com/user-attachments/assets/f4c12944-b331-4eea-9873-06bbaf1c4822" />
 <img width="1920" height="861" alt="Screenshot (534)" src="https://github.com/user-attachments/assets/cb364b69-ea2b-41d5-88e9-dd67f70caec1" />
 
+## ✨ Features
 
+-   **Job Description Analysis**: Extracts key skills and requirements from a job description to use as a benchmark.
+-   **Multi-Resume Comparison**: Add and analyze multiple candidate resumes simultaneously.
+-   **Automated Match Scoring**: Calculates a percentage-based match score for each candidate.
+-   **Detailed Skill Breakdown**: For each candidate, see which required skills they have and which they are missing.
+-   **Candidate Ranking**: Automatically sorts candidates from highest to lowest score for quick evaluation.
+-   **Modern & Responsive UI**: A clean, intuitive, and mobile-friendly interface built with Tailwind CSS.
+-   **No Backend Required**: All processing is done client-side in the browser, making it fast and easy to deploy.
 
+## 🚀 How to Use
+
+1.  **Live Demo**: **[Click here to try the live application!](https://Chakradhar6304.github.io/Resume-Screening-Engine/)**
+2.  **Paste Job Description**: Copy the full text of a job description into the first text box.
+3.  **Add Resumes**: Paste the text of one or more resumes into the candidate boxes. Use the `+ Add Another Resume` button if needed.
+4.  **Analyze**: Click the `Calculate Match Scores` button.
+5.  **Review Rankings**: The results will appear at the bottom, ranked from best to worst fit, with a detailed skill analysis for each candidate.
+
+## 🛠️ Built With
+
+-   **HTML5**
+-   **Tailwind CSS** - For styling and a responsive layout.
+-   **JavaScript (ES6)** - For all the core logic, including NLP and scoring.
