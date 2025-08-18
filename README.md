@@ -2,7 +2,6 @@
 
 An intelligent web-based tool to automatically score and rank job candidates by matching their resumes against a given job description. This project uses natural language processing (NLP) techniques directly in the browser to extract key skills and provide an instant analysis of candidate suitability.
 
-![AI Resume Matcher Screenshot]
 <img width="1920" height="863" alt="Screenshot (532)" src="https://github.com/user-attachments/assets/0e1152dc-22d5-46fb-932d-f04731237200" />
 <img width="1920" height="848" alt="Screenshot (533)" src="https://github.com/user-attachments/assets/f4c12944-b331-4eea-9873-06bbaf1c4822" />
 <img width="1920" height="861" alt="Screenshot (534)" src="https://github.com/user-attachments/assets/cb364b69-ea2b-41d5-88e9-dd67f70caec1" />
@@ -30,3 +29,4 @@ An intelligent web-based tool to automatically score and rank job candidates by 
 -   **HTML5**
 -   **Tailwind CSS** - For styling and a responsive layout.
 -   **JavaScript (ES6)** - For all the core logic, including NLP and scoring.
+
