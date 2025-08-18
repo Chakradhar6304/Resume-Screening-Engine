@@ -1,4 +1,4 @@
-# AI Resume Matcher 🤖
+# Resume-Screening-Engine 🤖
 
 An intelligent web-based tool to automatically score and rank job candidates by matching their resumes against a given job description. This project uses natural language processing (NLP) techniques directly in the browser to extract key skills and provide an instant analysis of candidate suitability.
 
@@ -29,4 +29,5 @@ An intelligent web-based tool to automatically score and rank job candidates by 
 -   **HTML5**
 -   **Tailwind CSS** - For styling and a responsive layout.
 -   **JavaScript (ES6)** - For all the core logic, including NLP and scoring.
+
 
